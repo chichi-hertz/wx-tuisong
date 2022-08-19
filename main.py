@@ -12,6 +12,7 @@ def get_color():
     # 获取随机颜色
     get_colors = lambda n: list(map(lambda i: "#" + "%06x" % random.randint(0, 0xFFFFFF), range(n)))
     color_list = get_colors(100)
+    # print(random.choice(color_list))
     return random.choice(color_list)
 
 
@@ -53,6 +54,7 @@ def get_weather(province, city):
     response.encoding = "utf-8"
     response_data = response.text.split(";")[0].split("=")[-1]
     response_json = eval(response_data)
+    # print('我是天气api请求的数据')
     # print(response_json)
     weatherinfo = response_json["weatherinfo"]
     # 天气
@@ -108,8 +110,10 @@ def caihongpi():
         data = res.read()
         data = json.loads(data)
         data = data["newslist"][0]["content"]
-        if("XXX" in data):
-            data.replace("XXX","蒋蒋")
+
+        if('XXX' in data):
+            data.replace("XXX","欣怡")
+        data = '「' + data + '」'
         return data
     else:
         return ""
@@ -125,10 +129,11 @@ def lizhi():
         res = conn.getresponse()
         data = res.read()
         data = json.loads(data)
-        return data["newslist"][0]["saying"]
+        data = '「'+data["newslist"][0]["saying"]+'」'
+        return data
     else:
         return ""
-        
+
 
 #下雨概率和建议
 def tip():
@@ -140,14 +145,35 @@ def tip():
         res = conn.getresponse()
         data = res.read()
         data = json.loads(data)
+        print(data)
+        # 天气
+        weather = data["newslist"][0]["weather"]
+        # 当前气温
+        real = data["newslist"][0]["real"]
+        # 最高气温
+        temp=data["newslist"][0]["highest"]
+        # 最低气温
+        tempn = data["newslist"][0]["lowest"]
+        # 降水概率
         pop = data["newslist"][0]["pop"]
+        # 风向
+        wind = data["newslist"][0]["wind"]
+        # 风力
+        windsc = data["newslist"][0]["windsc"]
+        # 湿度
+        humidity= data["newslist"][0]["humidity"]
+        # 紫外等级
+        uvindex= data["newslist"][0]["uv_index"]
+        # 建议
         tips = data["newslist"][0]["tips"]
-        return pop,tips
+
+        return weather,real,temp,tempn,pop,wind,windsc,humidity,uvindex,tips
     else:
         return "",""
 
 #推送信息
-def send_message(to_user, access_token, city_name, weather, max_temperature, min_temperature, pipi, lizhi, pop, tip, note_en, note_ch):
+def send_message(to_user, access_token, city_name, weather, real ,max_temperature, min_temperature, pipi, lizhi, pop,wind,windsc,humidity,uvindex, note_en, note_ch):
+    tips = ''
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
     year = localtime().tm_year
@@ -162,11 +188,52 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
     love_date = date(love_year, love_month, love_day)
     # 获取在一起的日期差
     love_days = str(today.__sub__(love_date)).split(" ")[0]
+    # 获取在一起的日子的日期格式
+    meet_year = int(config["meet_date"].split("-")[0])
+    meet_month = int(config["meet_date"].split("-")[1])
+    meet_day = int(config["meet_date"].split("-")[2])
+    meet_date = date(meet_year, meet_month, meet_day)
+    # 获取在一起的日期差
+    meet_days = str(today.__sub__(meet_date)).split(" ")[0]
+
     # 获取所有生日数据
     birthdays = {}
     for k, v in config.items():
         if k[0:5] == "birth":
             birthdays[k] = v
+
+    if int(max_temperature[:-1])>=37:
+        number = random.randint(0, 6)
+        if number==0:
+            tips='今天好热呀宝贝！出门的话注意防暑防晒哦~'
+        if number==1:
+            tips='妈呀太热了今天！宝贝出门注意防暑呀~'
+        if number==2:
+            tips='热死啦热死啦热死啦！宝贝出门注意防暑防晒哦~'
+        if number==3:
+            tips='宝贝出门注意防暑防晒！要热化了呜呜呜...'
+        if number==4:
+            tips='注热热热热热意热热热热热热防热热热热热暑...'
+        if number==5:
+            tips='非常燥热的一天...宝贝注意防暑！'
+        if number==6:
+            tips='热人闷人倦人的夏天...宝贝注意防暑！'
+    if int(min_temperature[:-1]) <= 3:
+        number = random.randint(0, 5)
+        if (number == 0):
+            tips = '今天好冷呀宝贝！注意保暖注意保暖~'
+        if (number == 1):
+            tips = '冻死我啦！宝贝注意保暖~'
+        if (number == 2):
+            tips = '妈呀这个天也太冷了！宝贝注意保暖~'
+        if (number == 3):
+            tips = '宝贝注意保暖！我的鼻涕被冻出来了呜呜呜...'
+        if (number == 4):
+            tips = '冻得我木木的...宝贝注意保暖！'
+        if (number == 5):
+            tips = '“不冷吗？”不冷才怪哦！宝贝注意保暖~'
+    if (int(love_days) % 100 == 0):
+        tips = '今天是我们恋爱{}天，宝贝永远在我心里~'.format(love_days)
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
@@ -179,31 +246,35 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
             },
             "city": {
                 "value": city_name,
-                "color": get_color()
+                # "color": get_color()
             },
             "weather": {
                 "value": weather,
-                "color": get_color()
+                # "color": get_color()
             },
             "min_temperature": {
                 "value": min_temperature,
-                "color": get_color()
+                "color": '#0e3ea9'
             },
             "max_temperature": {
                 "value": max_temperature,
-                "color": get_color()
+                "color": '#a90e0e'
             },
             "love_day": {
                 "value": love_days,
                 "color": get_color()
             },
+            "meet_day": {
+                "value": meet_days,
+                "color": get_color()
+            },
             "note_en": {
                 "value": note_en,
-                "color": get_color()
+                "color": "#6c6c6c"
             },
             "note_ch": {
                 "value": note_ch,
-                "color": get_color()
+                "color": "#6c6c6c"
             },
 
             "pipi": {
@@ -220,10 +291,29 @@ def send_message(to_user, access_token, city_name, weather, max_temperature, min
                 "value": pop,
                 "color": get_color()
             },
-
+            "real": {
+                "value": real,
+                "color": get_color()
+            },
+            "wind": {
+                "value": wind,
+                # "color": get_color()
+            },
+            "windsc": {
+                "value": windsc,
+                "color": get_color()
+            },
+            "humidity": {
+                "value": humidity,
+                "color": '#1f71b3'
+            },
+            "uvindex": {
+                "value": uvindex,
+                "color": "#482881"
+            },
             "tips": {
                 "value": tips,
-                "color": get_color()
+                "color": "#bf1965"
             }
         }
     }
@@ -269,7 +359,7 @@ if __name__ == "__main__":
     users = config["user"]
     # 传入省份和市获取天气信息
     province, city = config["province"], config["city"]
-    weather, max_temperature, min_temperature = get_weather(province, city)
+    # weather, max_temperature, min_temperature = get_weather(province, city)
     #获取彩虹屁API
     caihongpi_API=config["caihongpi_API"]
     #获取励志古言API
@@ -283,12 +373,12 @@ if __name__ == "__main__":
     #彩虹屁
     pipi = caihongpi()
     #下雨概率和建议
-    pop,tips = tip()
+    weather,real, max_temperature, min_temperature, pop,wind,windsc,humidity,uvindex,tips = tip()
     #励志名言
     lizhi = lizhi()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, city, weather, max_temperature, min_temperature, pipi, lizhi,pop,tips, note_en, note_ch)
+        send_message(user, accessToken, city, weather,real, max_temperature, min_temperature, pipi, lizhi,pop,wind,windsc,humidity,uvindex, note_en, note_ch)
     import time
     time_duration = 3.5
     time.sleep(time_duration)
