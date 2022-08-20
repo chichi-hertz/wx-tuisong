@@ -1,12 +1,19 @@
-import random
-from time import time, localtime
-import cityinfo
-from requests import get, post
-from datetime import datetime, date
-import sys
-import os
-import http.client, urllib
+import http.client
 import json
+import os
+import random
+import sys
+import urllib
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+from time import time
+
+from requests import get, post
+
+import cityinfo
+
 
 def get_color():
     # 获取随机颜色
@@ -83,65 +90,67 @@ def get_birthday(birthday, year, today):
         birth_day = str(birth_date.__sub__(today)).split(" ")[0]
     return birth_day
 
-#词霸每日一句
+
+# 词霸每日一句
 def get_ciba():
-    if (Whether_Eng!="否"):
+    if (Whether_Eng != "否"):
         url = "http://open.iciba.com/dsapi/"
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                        'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
+                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36'
         }
         r = get(url, headers=headers)
         note_en = r.json()["content"]
         note_ch = r.json()["note"]
         return note_ch, note_en
     else:
-        return "",""
+        return "", ""
 
-#彩虹屁
+
+# 彩虹屁
 def caihongpi():
-    if (caihongpi_API!="替换掉我"):
-        conn = http.client.HTTPSConnection('api.tianapi.com')  #接口域名
-        params = urllib.parse.urlencode({'key':caihongpi_API})
-        headers = {'Content-type':'application/x-www-form-urlencoded'}
-        conn.request('POST','/caihongpi/index',params,headers)
+    if (caihongpi_API != "替换掉我"):
+        conn = http.client.HTTPSConnection('api.tianapi.com')  # 接口域名
+        params = urllib.parse.urlencode({'key': caihongpi_API})
+        headers = {'Content-type': 'application/x-www-form-urlencoded'}
+        conn.request('POST', '/caihongpi/index', params, headers)
         res = conn.getresponse()
         data = res.read()
         data = json.loads(data)
         data = data["newslist"][0]["content"]
 
-        if('XXX' in data):
-            data.replace("XXX","欣怡")
+        if ('XXX' in data):
+            data.replace("XXX", "欣怡")
         data = '「' + data + '」'
         return data
     else:
         return ""
 
 
-#励志名言
+# 励志名言
 def lizhi():
-    if (lizhi_API!="替换掉我"):
-        conn = http.client.HTTPSConnection('api.tianapi.com')  #接口域名
-        params = urllib.parse.urlencode({'key':lizhi_API})
-        headers = {'Content-type':'application/x-www-form-urlencoded'}
-        conn.request('POST','/lzmy/index',params,headers)
+    if (lizhi_API != "替换掉我"):
+        conn = http.client.HTTPSConnection('api.tianapi.com')  # 接口域名
+        params = urllib.parse.urlencode({'key': lizhi_API})
+        headers = {'Content-type': 'application/x-www-form-urlencoded'}
+        conn.request('POST', '/lzmy/index', params, headers)
         res = conn.getresponse()
         data = res.read()
         data = json.loads(data)
-        data = '「'+data["newslist"][0]["saying"]+'」'
+        data = '「' + data["newslist"][0]["saying"] + '」'
         return data
     else:
         return ""
 
 
-#下雨概率和建议
+# 下雨概率和建议
 def tip():
-    if (tianqi_API!="替换掉我"):
-        conn = http.client.HTTPSConnection('api.tianapi.com')  #接口域名
-        params = urllib.parse.urlencode({'key':tianqi_API,'city':city})
-        headers = {'Content-type':'application/x-www-form-urlencoded'}
-        conn.request('POST','/tianqi/index',params,headers)
+    if (tianqi_API != "替换掉我"):
+        conn = http.client.HTTPSConnection('api.tianapi.com')  # 接口域名
+        params = urllib.parse.urlencode({'key': tianqi_API, 'city': city})
+        headers = {'Content-type': 'application/x-www-form-urlencoded'}
+        conn.request('POST', '/tianqi/index', params, headers)
         res = conn.getresponse()
         data = res.read()
         data = json.loads(data)
@@ -151,7 +160,7 @@ def tip():
         # 当前气温
         real = data["newslist"][0]["real"]
         # 最高气温
-        temp=data["newslist"][0]["highest"]
+        temp = data["newslist"][0]["highest"]
         # 最低气温
         tempn = data["newslist"][0]["lowest"]
         # 降水概率
@@ -161,24 +170,33 @@ def tip():
         # 风力
         windsc = data["newslist"][0]["windsc"]
         # 湿度
-        humidity= data["newslist"][0]["humidity"]
+        humidity = data["newslist"][0]["humidity"]
         # 紫外等级
-        uvindex= data["newslist"][0]["uv_index"]
+        uvindex = data["newslist"][0]["uv_index"]
         # 建议
         tips = data["newslist"][0]["tips"]
 
-        return weather,real,temp,tempn,pop,wind,windsc,humidity,uvindex,tips
+        return weather, real, temp, tempn, pop, wind, windsc, humidity, uvindex, tips
     else:
-        return "",""
+        return "", ""
 
-#推送信息
-def send_message(to_user, access_token, city_name, weather, real ,max_temperature, min_temperature, pipi, lizhi, pop,wind,windsc,humidity,uvindex, note_en, note_ch):
+
+# 推送信息
+def send_message(to_user, access_token, city_name, weather, real, max_temperature, min_temperature, pipi, lizhi, pop,
+                 wind, windsc, humidity, uvindex, note_en, note_ch):
     tips = ''
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
+    utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    SHA_TZ = timezone(
+        timedelta(hours=8),
+        name='Asia/Shanghai',
+    )
+    # 北京时间
+    beijing_now = utc_now.astimezone(SHA_TZ)
     week_list = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
-    year = localtime().tm_year
-    month = localtime().tm_mon
-    day = localtime().tm_mday
+    year = beijing_now.timetuple().tm_year
+    month = beijing_now.timetuple().tm_mon
+    day = beijing_now.timetuple().tm_mday
     today = datetime.date(datetime(year=year, month=month, day=day))
     week = week_list[today.isoweekday() % 7]
     # 获取在一起的日子的日期格式
@@ -202,37 +220,37 @@ def send_message(to_user, access_token, city_name, weather, real ,max_temperatur
         if k[0:5] == "birth":
             birthdays[k] = v
 
-    if int(max_temperature[:-1])>=37:
+    if int(max_temperature[:-1]) >= 37:
         number = random.randint(0, 6)
-        if number==0:
-            tips='今天好热呀宝贝！出门的话注意防暑防晒哦~'
-        if number==1:
-            tips='妈呀太热了今天！宝贝出门注意防暑呀~'
-        if number==2:
-            tips='热死啦热死啦热死啦！宝贝出门注意防暑防晒哦~'
-        if number==3:
-            tips='宝贝出门注意防暑防晒！要热化了呜呜呜...'
-        if number==4:
-            tips='注热热热热热意热热热热热热防热热热热热暑...'
-        if number==5:
-            tips='非常燥热的一天...宝贝注意防暑！'
-        if number==6:
-            tips='热人闷人倦人的夏天...宝贝注意防暑！'
+        if number == 0:
+            tips = '今天好热呀宝贝！出门的话注意防暑防晒哦~'
+        if number == 1:
+            tips = '妈呀太热了今天！宝贝出门注意防暑呀~'
+        if number == 2:
+            tips = '热死啦热死啦热死啦！宝贝出门注意防暑防晒哦~'
+        if number == 3:
+            tips = '宝贝出门注意防暑防晒！要热化了呜呜呜...'
+        if number == 4:
+            tips = '注热热热热热意热热热热热热防热热热热热暑...'
+        if number == 5:
+            tips = '非常燥热的一天...宝贝注意防暑！'
+        if number == 6:
+            tips = '热人闷人倦人的夏天...宝贝注意防暑！'
     if int(min_temperature[:-1]) <= 3:
         number = random.randint(0, 5)
-        if (number == 0):
+        if number == 0:
             tips = '今天好冷呀宝贝！注意保暖注意保暖~'
-        if (number == 1):
+        if number == 1:
             tips = '冻死我啦！宝贝注意保暖~'
-        if (number == 2):
+        if number == 2:
             tips = '妈呀这个天也太冷了！宝贝注意保暖~'
-        if (number == 3):
+        if number == 3:
             tips = '宝贝注意保暖！我的鼻涕被冻出来了呜呜呜...'
-        if (number == 4):
+        if number == 4:
             tips = '冻得我木木的...宝贝注意保暖！'
-        if (number == 5):
+        if number == 5:
             tips = '“不冷吗？”不冷才怪哦！宝贝注意保暖~'
-    if (int(love_days) % 100 == 0):
+    if int(love_days) % 100 == 0:
         tips = '今天是我们恋爱{}天，宝贝永远在我心里~'.format(love_days)
     data = {
         "touser": to_user,
@@ -360,25 +378,27 @@ if __name__ == "__main__":
     # 传入省份和市获取天气信息
     province, city = config["province"], config["city"]
     # weather, max_temperature, min_temperature = get_weather(province, city)
-    #获取彩虹屁API
-    caihongpi_API=config["caihongpi_API"]
-    #获取励志古言API
-    lizhi_API=config["lizhi_API"]
-    #获取天气预报API
-    tianqi_API=config["tianqi_API"]
-    #是否启用词霸每日金句
-    Whether_Eng=config["Whether_Eng"]
+    # 获取彩虹屁API
+    caihongpi_API = config["caihongpi_API"]
+    # 获取励志古言API
+    lizhi_API = config["lizhi_API"]
+    # 获取天气预报API
+    tianqi_API = config["tianqi_API"]
+    # 是否启用词霸每日金句
+    Whether_Eng = config["Whether_Eng"]
     # 获取词霸每日金句
     note_ch, note_en = get_ciba()
-    #彩虹屁
+    # 彩虹屁
     pipi = caihongpi()
-    #下雨概率和建议
-    weather,real, max_temperature, min_temperature, pop,wind,windsc,humidity,uvindex,tips = tip()
-    #励志名言
+    # 下雨概率和建议
+    weather, real, max_temperature, min_temperature, pop, wind, windsc, humidity, uvindex, tips = tip()
+    # 励志名言
     lizhi = lizhi()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, city, weather,real, max_temperature, min_temperature, pipi, lizhi,pop,wind,windsc,humidity,uvindex, note_en, note_ch)
+        send_message(user, accessToken, city, weather, real, max_temperature, min_temperature, pipi, lizhi, pop, wind,
+                     windsc, humidity, uvindex, note_en, note_ch)
     import time
+
     time_duration = 3.5
     time.sleep(time_duration)
