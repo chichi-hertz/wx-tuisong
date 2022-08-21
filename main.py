@@ -119,9 +119,8 @@ def caihongpi():
         data = res.read()
         data = json.loads(data)
         data = data["newslist"][0]["content"]
-
         if ('XXX' in data):
-            data.replace("XXX", "欣怡")
+            data = data.replace("XXX", "欣怡")
         data = '「' + data + '」'
         return data
     else:
@@ -231,13 +230,13 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
         if number == 3:
             tips = '宝贝出门注意防暑防晒！要热化了呜呜呜...'
         if number == 4:
-            tips = '注热热热热热意热热热热热热防热热热热热暑...'
+            tips = '热热热热热热热热热热热热热热热热...'
         if number == 5:
             tips = '非常燥热的一天...宝贝注意防暑！'
         if number == 6:
             tips = '热人闷人倦人的夏天...宝贝注意防暑！'
     if int(min_temperature[:-1]) <= 3:
-        number = random.randint(0, 5)
+        number = random.randint(0, 6)
         if number == 0:
             tips = '今天好冷呀宝贝！注意保暖注意保暖~'
         if number == 1:
@@ -250,8 +249,10 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
             tips = '冻得我木木的...宝贝注意保暖！'
         if number == 5:
             tips = '“不冷吗？”不冷才怪哦！宝贝注意保暖~'
+        if number == 6:
+            tips = '冷冷冷冷冷冷冷冷冷冷冻冻冻冻死我了'
     if int(love_days) % 100 == 0:
-        tips = '今天是我们恋爱{}天，宝贝永远在我心里~'.format(love_days)
+        tips = '今天是我们恋爱的{}天，宝贝永远在我心里~'.format(love_days)
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
