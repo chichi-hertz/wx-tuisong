@@ -18,16 +18,14 @@ print(data)
 # 今天是{{date.DATA}}
 # {{city.DATA}} {{weather.DATA}} 当前{{real.DATA}} 今日{{min_temperature.DATA}}-{{max_temperature.DATA}} 降雨概率{{pop.DATA}}%
 # {{wind.DATA}}，风力{{windsc.DATA}}，湿度{{humidity.DATA}}%，紫外线指数{{uvindex.DATA}}。
-# {{tips.DATA}}
+# {{temptips.DATA}}{{raintips.DATA}}
 #
 # 我们已经认识{{meet_day.DATA}}天啦！
 # 今天是我们恋爱的第{{love_day.DATA}}天哦！
 # 距离宝贝生日还有{{birthday1.DATA}}天~
 # 距离我的生日还有{{birthday2.DATA}}天~
 #
-# {{lizhi.DATA}}
-#
 # {{note_en.DATA}}
 # {{note_ch.DATA}}
+# {{lovetips.DATA}}
 #
-# {{pipi.DATA}}
