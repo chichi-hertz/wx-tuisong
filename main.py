@@ -182,8 +182,8 @@ def tip():
 def send_message(to_user, access_token, city_name, weather, real, max_temperature, min_temperature, pop,
                  wind, windsc, humidity, uvindex, note_en, note_ch):
     temperatureTips = ''
-    rainTips=''
-    loveTips=''
+    rainTips = ''
+    loveTips = ''
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
     SHA_TZ = timezone(
@@ -220,44 +220,52 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
             birthdays[k] = v
     # 温度大于37度，触发热语句
     if int(max_temperature[:-1]) >= 37:
-        number = random.randint(0, 6)
-        if number == 0:
-            temperatureTips = '今天好热呀宝贝！出门的话注意防暑防晒哦~'
-        if number == 1:
-            temperatureTips = '妈呀太热了今天！宝贝出门注意防暑呀~'
-        if number == 2:
-            temperatureTips = '热死啦热死啦热死啦！宝贝出门注意防暑防晒哦~'
-        if number == 3:
-            temperatureTips = '宝贝出门注意防暑防晒！要热化了呜呜呜...'
-        if number == 4:
-            temperatureTips = '热热热热热热热热热热热热热热热热...'
-        if number == 5:
-            temperatureTips = '非常燥热的一天...宝贝注意防暑！'
-        if number == 6:
-            temperatureTips = '热人闷人倦人的夏天...宝贝注意防暑！'
+        temperatureTipsLib = ['今天好热呀宝贝！出门的话注意防暑防晒哦~',
+                              '妈呀太热了今天！宝贝出门注意防暑呀~',
+                              '热死啦热死啦热死啦！宝贝出门注意防暑防晒哦~',
+                              '宝贝出门注意防暑防晒！要热化了呜呜呜...',
+                              '热热热热热热热热热热热热热热热热...',
+                              '非常燥热的一天...宝贝注意防暑！',
+                              '热人闷人倦人的夏天...宝贝注意防暑！'
+                              ]
+        temperatureTips = random.choice(temperatureTipsLib)
     # 温度小于3度 触发冷语句
     if int(min_temperature[:-1]) <= 3:
-        number = random.randint(0, 6)
-        if number == 0:
-            temperatureTips = '今天好冷呀宝贝！注意保暖注意保暖~'
-        if number == 1:
-            temperatureTips = '冻死我啦！宝贝注意保暖~'
-        if number == 2:
-            temperatureTips = '妈呀这个天也太冷了！宝贝注意保暖~'
-        if number == 3:
-            temperatureTips = '宝贝注意保暖！我的鼻涕被冻出来了呜呜呜...'
-        if number == 4:
-            temperatureTips = '冻得我木木的...宝贝注意保暖！'
-        if number == 5:
-            temperatureTips = '“不冷吗？”不冷才怪哦！宝贝注意保暖~'
-        if number == 6:
-            temperatureTips = '冷冷冷冷冷冷冷冷冷冷冻冻冻冻死我了'
+        temperatureTipsLib = ['今天好冷呀宝贝！注意保暖注意保暖~',
+                              '冻死我啦！宝贝注意保暖~',
+                              '妈呀这个天也太冷了！宝贝注意保暖~',
+                              '宝贝注意保暖！我的鼻涕被冻出来了呜呜呜...',
+                              '冻得我木木的...宝贝注意保暖！',
+                              '“不冷吗？”不冷才怪哦！宝贝注意保暖~',
+                              '冷冷冷冷冷冷冷冷冷冷冻冻冻冻死我了'
+                              ]
+        temperatureTips = random.choice(temperatureTipsLib)
     # 降水概率大于70 触发带伞
-    if int(pop) >= 70:
-        rainTips = '今天有{}%的概率下雨,宝贝出门记得带伞~'.format(pop)
+    if int(pop) >= 65:
+        rainTipsLib = ['最美的不是下雨天，是和你一起躲过雨的屋檐。',
+                       '你笑时，雷声温柔，暴雨无声。',
+                       '都怪雨下得那么急，都怪没有地方躲雨，才会一头撞进了你的怀里。',
+                       '樱桃蒙上了薄薄的水雾，像绯红色的雨，我走在你的身后，满目皆暖。',
+                       '我喜欢你，就像天气预报说，明天有雨我都能听成明天有你。',
+                       '你不要淋到雨啦，不然你会可爱到发芽。',
+                       '天气好时去见你，天气不好时带着伞去见你。',
+                       '听雨的声音，一滴滴清晰，你的呼吸像雨滴渗入我的爱里。',
+                       '你的爱是把大大的伞，给我最美的晴空。'
+                       ]
+        rainTips = random.choice(rainTipsLib)
+    elif int(pop) <= 30:
+        rainTipsLib = ['心存阳光，必有诗和远方。',
+                       '只要有你，我的每天都是晴天。',
+                       '慢慢走，沿途有风景，背后有阳光。',
+                       '远方是你，山川是你，蓝天白云是你，极致温柔是你。',
+                       '晴天要快乐~',
+                       '天气好得就像走着走着就能遇见你。',
+                       '天气好时去见你，天气不好时带着伞去见你。'
+                       ]
+        rainTips = random.choice(rainTipsLib)
     # 特殊日子触发纪念日语句
-    if int(love_days) % 100 == 0:
-        loveTips = '今天是我们恋爱的{}天，祝我们矢志不渝~'.format(love_days)
+    if int(love_days) % 100 | int(love_days) % 365 == 0:
+        loveTips = '悸动的第{}天'.format(love_days)
     data = {
         "touser": to_user,
         "template_id": config["template_id"],

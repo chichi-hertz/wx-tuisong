@@ -1,9 +1,11 @@
-
-data='XXX是美丽的'
-
-if 'XXX' in data:
-    print('我被执行了')
-    data=data.replace("XXX", "王欣怡", 1)
-
-# data = '「' + data + '」'
-print(data)
+import random
+rainTipsLib = ['最美的不是下雨天，是和你一起躲过雨的屋檐。',
+               '你笑时，雷声温柔，暴雨无声。',
+               '都怪雨下得那么急，都怪没有地方躲雨，才会一头撞进了你的怀里。',
+               '樱桃蒙上了薄薄的水雾，像绯红色的雨，我走在你的身后，满目皆暖。',
+               '我喜欢你，就像天气预报说，明天有雨我都能听成明天有你。',
+               "你不要淋到雨啦，不然你会可爱到发芽。",
+               "天气好时去见你，天气不好时带着伞去见你。"
+               ]
+rainTips=random.choice(rainTipsLib)
+print(rainTips)
