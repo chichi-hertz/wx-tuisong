@@ -240,8 +240,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                               '冷冷冷冷冷冷冷冷冷冷冻冻冻冻死我了'
                               ]
         temperatureTips = random.choice(temperatureTipsLib)
-    # 降水概率大于70 触发带伞
-    if int(pop) >= 65:
+    # 降水概率大于70
+    if int(pop) >= 70:
         rainTipsLib = ['最美的不是下雨天，是和你一起躲过雨的屋檐。',
                        '你笑时，雷声温柔，暴雨无声。',
                        '都怪雨下得那么急，都怪没有地方躲雨，才会一头撞进了你的怀里。',
@@ -253,7 +253,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                        '你的爱是把大大的伞，给我最美的晴空。'
                        ]
         rainTips = random.choice(rainTipsLib)
-    elif int(pop) <= 30:
+    # 降水概率小于20
+    elif int(pop) <= 20:
         rainTipsLib = ['心存阳光，必有诗和远方。',
                        '只要有你，我的每天都是晴天。',
                        '慢慢走，沿途有风景，背后有阳光。',
@@ -264,8 +265,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                        ]
         rainTips = random.choice(rainTipsLib)
     # 特殊日子触发纪念日语句
-    if int(love_days) % 100 | int(love_days) % 365 == 0:
-        loveTips = '悸动的第{}天'.format(love_days)
+    if int(love_days) % 100 == 0 | int(love_days) % 365 == 0:
+        loveTips = '我们还会有很多很多个{}天。'.format(love_days)
     data = {
         "touser": to_user,
         "template_id": config["template_id"],
