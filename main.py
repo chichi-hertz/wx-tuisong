@@ -241,7 +241,7 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                               ]
         temperatureTips = random.choice(temperatureTipsLib)
     # 降水概率大于70
-    if int(pop) >= 70:
+    if int(pop) >= 65:
         rainTipsLib = ['最美的不是下雨天，是和你一起躲过雨的屋檐。',
                        '你笑时，雷声温柔，暴雨无声。',
                        '都怪雨下得那么急，都怪没有地方躲雨，才会一头撞进了你的怀里。',
@@ -254,7 +254,7 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                        ]
         rainTips = random.choice(rainTipsLib)
     # 降水概率小于20
-    elif int(pop) <= 20:
+    elif int(pop) <= 25:
         rainTipsLib = ['心存阳光，必有诗和远方。',
                        '只要有你，我的每天都是晴天。',
                        '慢慢走，沿途有风景，背后有阳光。',
