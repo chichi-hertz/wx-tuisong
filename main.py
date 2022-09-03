@@ -10,6 +10,7 @@ from datetime import timedelta
 from datetime import timezone
 from time import time
 
+import requests
 from requests import get, post
 
 import cityinfo
@@ -184,6 +185,7 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
     temperatureTips = ''
     rainTips = ''
     loveTips = ''
+    weekTips = ''
     url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token={}".format(access_token)
     utc_now = datetime.utcnow().replace(tzinfo=timezone.utc)
     SHA_TZ = timezone(
@@ -198,6 +200,74 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
     day = beijing_now.timetuple().tm_mday
     today = datetime.date(datetime(year=year, month=month, day=day))
     week = week_list[today.isoweekday() % 7]
+    # 获取休息日工作日API
+    todatymd = today.strftime("%Y%m%d")
+    isWeekDay = requests.get(url='http://tool.bitefu.net/jiari/', params='d={}'.format(todatymd))
+    isWeekDay = isWeekDay.text
+    isWeekDay = json.loads(isWeekDay)
+    if isWeekDay == 1:
+        weekTipsLib = ['既然今天是休息日，那我的宝贝就可以多睡一会儿啦~',
+                       '宝贝休息日快乐！可以干点自己想干的事情啦~',
+                       '休息日，吃饱饱！',
+                       '今天是休息日啦啦啦啦啦啦啦啦',
+                       ]
+        weekTips = random.choice(weekTipsLib)
+    elif isWeekDay == 2:
+        weekTipsLib = ['既然今天是节假日，那我的宝贝就可以多睡一会儿啦~',
+                       '今天是小长假哦~宝贝有没有好好休息呀~',
+                       '今天是节假日啦啦啦啦啦啦啦啦'
+                       ]
+        weekTips = random.choice(weekTipsLib)
+    elif isWeekDay == 0:
+        if week == '星期一':
+            weekTipsLib = ['周一周一 呆若木鸡',
+                           '今天周一呜呜呜呜呜呜呜',
+                           '人生很短 周一很长',
+                           '周一奶茶一杯 一周快乐起飞'
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期二':
+            weekTipsLib = ['周二摆烂 以烂制烂',
+                           '周二划水 喝茶抖腿',
+                           '周二摸鱼 心旷神怡',
+                           '周二喝拿铁 遇事都能解'
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期三':
+            weekTipsLib = ['熬过周三 翻过大山',
+                           '周三周三 一座大山',
+                           '周三瑞纳冰 心态更年轻',
+                           'OMG周三困得想死'
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期四':
+            weekTipsLib = ['周四不卷 卧倒消遣',
+                           '周四躺平 量力而行',
+                           '熬过星期四 世上无难事',
+                           '周四加班崩溃 来杯葡萄冰萃',
+                           '疯狂星期四，谁请我吃？'
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期五':
+            weekTipsLib = ['周五没有文案 只有快乐',
+                           '周五五五五五',
+                           '熬过星期五 生龙又活虎',
+                           '周五就该有周五的样子 有事下周再说',
+                           '周五了 该摆烂了'
+                           '周五领导检查 别慌点杯奶茶'
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期六':
+            weekTipsLib = ['今天明明是周六...sad',
+                           '累了！',
+                           ]
+            weekTips = random.choice(weekTipsLib)
+        if week == '星期日':
+            weekTipsLib = ['今天明明是周日...sad',
+                           '调休人，调休魂，调休de都是人上人',
+                           ]
+            weekTips = random.choice(weekTipsLib)
+
     # 获取在一起的日子的日期格式
     love_year = int(config["love_date"].split("-")[0])
     love_month = int(config["love_date"].split("-")[1])
@@ -355,6 +425,10 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
             "lovetips": {
                 "value": loveTips,
                 "color": "#f91864"
+            },
+            'weektips': {
+                "value": weekTips,
+                "color": "#af8405"
             }
         }
     }
