@@ -202,7 +202,7 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
     week = week_list[today.isoweekday() % 7]
     # 获取休息日工作日API
     todatymd = today.strftime("%Y%m%d")
-    isWeekDay = requests.get(url='http://tool.bitefu.net/jiari/', params='d={}'.format(todatymd))
+    isWeekDay = requests.get(url='http://www.ddung.org/jiari/', params='d={}'.format(todatymd))
     isWeekDay = isWeekDay.text
     isWeekDay = json.loads(isWeekDay)
     if isWeekDay == 1:
