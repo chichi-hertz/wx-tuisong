@@ -210,6 +210,7 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                        '宝贝休息日快乐！可以干点自己想干的事情啦~',
                        '休息日，吃饱饱！',
                        '今天是休息日啦啦啦啦啦啦啦啦',
+                       '宝贝休息日快乐~有没有好好休息呀~'
                        ]
         weekTips = random.choice(weekTipsLib)
     elif isWeekDay == 2:
