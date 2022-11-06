@@ -163,8 +163,8 @@ def tip():
         temp = data["newslist"][0]["highest"]
         # 最低气温
         tempn = data["newslist"][0]["lowest"]
-        # 降水概率
-        pop = data["newslist"][0]["pop"]
+        # 降雨量
+        pcpn = data["newslist"][0]["pcpn"]
         # 风向
         wind = data["newslist"][0]["wind"]
         # 风力
@@ -173,14 +173,13 @@ def tip():
         humidity = data["newslist"][0]["humidity"]
         # 紫外等级
         uvindex = data["newslist"][0]["uv_index"]
-
-        return weather, real, temp, tempn, pop, wind, windsc, humidity, uvindex
+        return weather, real, temp, tempn, pcpn, wind, windsc, humidity, uvindex
     else:
         return "", ""
 
 
 # 推送信息
-def send_message(to_user, access_token, city_name, weather, real, max_temperature, min_temperature, pop,
+def send_message(to_user, access_token, city_name, weather, real, max_temperature, min_temperature, pcpn,
                  wind, windsc, humidity, uvindex, note_en, note_ch):
     temperatureTips = ''
     rainTips = ''
@@ -311,8 +310,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                               '冷冷冷冷冷冷冷冷冷冷冻冻冻冻死我了'
                               ]
         temperatureTips = random.choice(temperatureTipsLib)
-    # 降水概率大于70
-    if int(pop) >= 65:
+    # # 降水概率大于70
+    if float(pcpn) > 10:
         rainTipsLib = ['最美的不是下雨天，是和你一起躲过雨的屋檐。',
                        '你笑时，雷声温柔，暴雨无声。',
                        '都怪雨下得那么急，都怪没有地方躲雨，才会一头撞进了你的怀里。',
@@ -324,8 +323,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
                        '你的爱是把大大的伞，给我最美的晴空。'
                        ]
         rainTips = random.choice(rainTipsLib)
-    # 降水概率小于20
-    elif int(pop) <= 25:
+    # 降雨量小于10
+    elif float(pcpn) <= 10:
         rainTipsLib = ['心存阳光，必有诗和远方。',
                        '只要有你，我的每天都是晴天。',
                        '慢慢走，沿途有风景，背后有阳光。',
@@ -391,8 +390,8 @@ def send_message(to_user, access_token, city_name, weather, real, max_temperatur
             #     "color": get_color()
             # },
 
-            "pop": {
-                "value": pop,
+            "pcpn": {
+                "value": pcpn,
                 "color": get_color()
             },
             "real": {
@@ -489,12 +488,12 @@ if __name__ == "__main__":
     # 彩虹屁
     # pipi = caihongpi()
     # 下雨概率和建议
-    weather, real, max_temperature, min_temperature, pop, wind, windsc, humidity, uvindex = tip()
+    weather, real, max_temperature, min_temperature, pcpn, wind, windsc, humidity, uvindex = tip()
     # 励志名言
     # lizhi = lizhi()
     # 公众号推送消息
     for user in users:
-        send_message(user, accessToken, city, weather, real, max_temperature, min_temperature, pop, wind,
+        send_message(user, accessToken, city, weather, real, max_temperature, min_temperature, pcpn, wind,
                      windsc, humidity, uvindex, note_en, note_ch)
     import time
 

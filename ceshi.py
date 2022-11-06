@@ -94,7 +94,7 @@ print(weekTips)
 
 # 模板
 # 今天是{{date.DATA}}
-# {{city.DATA}} {{weather.DATA}} 当前{{real.DATA}} 今日{{min_temperature.DATA}}-{{max_temperature.DATA}} 降雨概率{{pop.DATA}}%
+# {{city.DATA}} {{weather.DATA}} 当前{{real.DATA}} 今日{{min_temperature.DATA}}-{{max_temperature.DATA}} 降雨量{{pcpn.DATA}}毫米
 # {{wind.DATA}}，风力{{windsc.DATA}}，湿度{{humidity.DATA}}%，紫外线指数{{uvindex.DATA}}。
 # {{weektips.DATA}}
 # {{temptips.DATA}}{{raintips.DATA}}
